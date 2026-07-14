@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Color tokens — industrial workshop palette */
+  --ink: #16202A;         /* graphite background */
+  --ink-2: #1F2C38;       /* panel surface */
+  --ink-3: #2B3A47;       /* raised surface / borders */
+  --steel: #6E8AA6;       /* muted steel blue */
+  --amber: #F2A93B;       /* safety amber accent */
+  --amber-dim: #C98A2C;
+  --green: #4FA97A;       /* completed */
+  --blue: #4E8FD6;        /* active */
+  --paper: #EDEFF2;       /* light text on dark */
+  --paper-dim: #9AA7B2;   /* secondary text */
+  --danger: #D9604F;
+
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell {
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--ink);
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+p, label, span, input, select, textarea, button {
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  outline: none;
+}
+
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+::placeholder {
+  color: var(--paper-dim);
+}
+
+/* Blueprint grid texture — signature background motif */
+.blueprint-bg {
+  background-image:
+    linear-gradient(rgba(110,138,166,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110,138,166,0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px 18px 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
