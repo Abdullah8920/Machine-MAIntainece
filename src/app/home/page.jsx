@@ -4,6 +4,20 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Card from "@/components/Card";
 
+
+const FLOATING_TOOLS = [
+  { icon: "🔧", top: "8%", left: "14%", delay: "0s", size: "20px" },
+  { icon: "⚙️", top: "12%", left: "78%", delay: "0.6s", size: "18px" },
+  { icon: "🛠️", top: "28%", left: "22%", delay: "1.1s", size: "16px" },
+  { icon: "🔩", top: "34%", left: "84%", delay: "0.3s", size: "18px" },
+  { icon: "🪛", top: "48%", left: "10%", delay: "1.4s", size: "18px" },
+  { icon: "🔧", top: "58%", left: "88%", delay: "0.8s", size: "16px" },
+  { icon: "⚙️", top: "68%", left: "18%", delay: "0.2s", size: "20px" },
+  { icon: "🛠️", top: "78%", left: "80%", delay: "1.2s", size: "16px" },
+  { icon: "🔩", top: "90%", left: "30%", delay: "0.5s", size: "18px" },
+];
+
+
 const OPTIONS = [
   {
     to: "/add-machine",
@@ -23,6 +37,7 @@ export default function Home() {
   const router = useRouter();
 
   return (
+
     <div className="page">
       <Header title="Home" />
       <div className="page-content">
@@ -37,6 +52,7 @@ export default function Home() {
         >
           Choose an option
         </p>
+
 
         {OPTIONS.map((opt) => (
           <Card
