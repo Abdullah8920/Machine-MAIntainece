@@ -155,7 +155,7 @@ export default function ClientDetail() {
                   }}
                 >
                   <option value="Pending">Pending</option>
-                  <option value="Active">?Under-Process</option>
+                  <option value="Active">Under-Process</option>
                   <option value="Completed">Completed</option>
                 </select>
               </div>
@@ -176,6 +176,8 @@ export default function ClientDetail() {
             )}
 
             <DetailRow label="Date" value={current.date} />
+            <DetailRow label="Delivery Date" value={current.deliveryDate || "-"} />
+            <DetailRow label="Machine Type" value={current.machineType || "New"} />
             <DetailRow label="Defect" value={current.defect} />
             <DetailRow label="Total Cost" value={`Rs ${current.cost}`} />
             <DetailRow label="Advance Received" value={`Rs ${current.advance || 0}`} />

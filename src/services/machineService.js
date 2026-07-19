@@ -58,7 +58,9 @@ export async function addMachineEntry({
   clientName,
   companyName,
   machineName,
+  machineType = "New",
   date,
+  deliveryDate = "",
   defect,
   cost,
   advance = 0,
@@ -83,7 +85,9 @@ export async function addMachineEntry({
   const machineEntry = {
     id: machineId,
     machineName,
+    machineType,
     date,
+    deliveryDate,
     defect,
     cost,
     advance,
@@ -161,6 +165,12 @@ export async function updateMachineEntry(clientId, machineId, updates) {
     fieldUpdates[`machines.${machineId}.${key}`] = updates[key];
   });
   await updateDoc(ref, fieldUpdates);
+}
+
+/** Updates the client-level clientName / companyName fields. */
+export async function updateClientInfo(clientId, { clientName, companyName }) {
+  const ref = doc(db, CLIENTS_COLLECTION, clientId);
+  await updateDoc(ref, { clientName, companyName });
 }
 
 /**

@@ -10,6 +10,7 @@ import {
     getClientById,
     getClientHistory,
     updateMachineEntry,
+    updateClientInfo,
 } from "@/services/machineService";
 
 export default function EditMachine() {
@@ -21,8 +22,12 @@ export default function EditMachine() {
     const [error, setError] = useState("");
     const [machineId, setMachineId] = useState(null);
     const [form, setForm] = useState({
+        clientName: "",
+        companyName: "",
         machineName: "",
+        machineType: "New",
         date: "",
+        deliveryDate: "",
         defect: "",
         cost: "",
         advance: "",
@@ -43,8 +48,12 @@ export default function EditMachine() {
             if (!cancelled && client && current) {
                 setMachineId(current.id);
                 setForm({
+                    clientName: client.clientName || "",
+                    companyName: client.companyName || "",
                     machineName: current.machineName || "",
+                    machineType: current.machineType || "New",
                     date: current.date || "",
+                    deliveryDate: current.deliveryDate || "",
                     defect: current.defect || "",
                     cost: current.cost || "",
                     advance: current.advance || "",
@@ -66,7 +75,7 @@ export default function EditMachine() {
     };
 
     const handleSave = async () => {
-        const required = ["machineName", "date", "defect", "cost"];
+        const required = ["clientName", "companyName", "machineName", "date", "defect", "cost"];
         const missing = required.some((key) => !form[key]);
         if (missing) {
             setError("Please fill all required fields.");
@@ -75,8 +84,13 @@ export default function EditMachine() {
         setError("");
         setSaving(true);
 
+        const { clientName, companyName, ...machineFields } = form;
+
         try {
-            await updateMachineEntry(id, machineId, form);
+            await Promise.all([
+                updateClientInfo(id, { clientName, companyName }),
+                updateMachineEntry(id, machineId, machineFields),
+            ]);
             router.push(`/client/${id}`);
         } catch (err) {
             console.error(err);
@@ -111,8 +125,19 @@ export default function EditMachine() {
         <div className="page">
             <Header title="Edit Entry" back />
             <div className="page-content">
+                <Input label="Client Name" name="clientName" value={form.clientName} onChange={handleChange} required />
+                <Input label="Company Name" name="companyName" value={form.companyName} onChange={handleChange} required />
                 <Input label="Machine Name" name="machineName" value={form.machineName} onChange={handleChange} required />
+                <Input
+                    label="Machine Type"
+                    name="machineType"
+                    as="select"
+                    options={["New", "Old"]}
+                    value={form.machineType}
+                    onChange={handleChange}
+                />
                 <Input label="Date" name="date" type="date" value={form.date} onChange={handleChange} required />
+                <Input label="Delivery Date" name="deliveryDate" type="date" value={form.deliveryDate} onChange={handleChange} />
                 <Input label="Defect" name="defect" as="textarea" value={form.defect} onChange={handleChange} required />
                 <Input label="Total Cost" name="cost" type="number" value={form.cost} onChange={handleChange} required />
                 <Input label="Advance Received" name="advance" type="number" value={form.advance} onChange={handleChange} />
