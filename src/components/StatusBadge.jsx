@@ -4,8 +4,15 @@ const STATUS_COLORS = {
   Completed: "var(--green)",
 };
 
+const STATUS_LABELS = {
+  Active: "Under Process",
+  Pending: "Pending",
+  Completed: "Completed",
+};
+
 export default function StatusBadge({ status }) {
   const color = STATUS_COLORS[status] || "var(--steel)";
+  const label = STATUS_LABELS[status] || status;
   return (
     <span
       style={{
@@ -30,7 +37,7 @@ export default function StatusBadge({ status }) {
           background: color,
         }}
       />
-      {status}
+      {label}
     </span>
   );
 }

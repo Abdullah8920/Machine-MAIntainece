@@ -11,9 +11,13 @@ export function downloadClientReport(client, history) {
     const marginX = 40;
     let y = 50;
 
+
+    const STATUS_LABELS = { Active: "Under Process", Pending: "Pending", Completed: "Completed" };
+    const statusLabel = (s) => STATUS_LABELS[s] || s || "-";
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Machine Maintenance Report", marginX, y);
+    doc.text("Machine Report", marginX, y);
 
     y += 26;
     doc.setFontSize(12);
@@ -37,7 +41,7 @@ export function downloadClientReport(client, history) {
         const balance = (Number(current.cost) || 0) - (Number(current.advance) || 0);
         const lines = [
             [`Date`, current.date || "-"],
-            [`Status`, current.status || "-"],
+            [`Status`, statusLabel(current.status)],
             [`Defect`, current.defect || "-"],
             [`Total Cost`, `Rs ${current.cost || "-"}`],
             [`Advance Received`, `Rs ${current.advance || 0}`],
@@ -68,7 +72,7 @@ export function downloadClientReport(client, history) {
             `Rs ${r.advance || 0}`,
             `Rs ${(Number(r.cost) || 0) - (Number(r.advance) || 0)}`,
             r.remarks || "-",
-            r.status || "-",
+            statusLabel(r.status),
         ]),
         styles: { fontSize: 8, cellPadding: 4 },
         headStyles: { fillColor: [22, 32, 42] },
