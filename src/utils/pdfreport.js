@@ -34,11 +34,14 @@ export function downloadClientReport(client, history) {
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
+        const balance = (Number(current.cost) || 0) - (Number(current.advance) || 0);
         const lines = [
             [`Date`, current.date || "-"],
             [`Status`, current.status || "-"],
             [`Defect`, current.defect || "-"],
-            [`Cost`, `Rs ${current.cost || "-"}`],
+            [`Total Cost`, `Rs ${current.cost || "-"}`],
+            [`Advance Received`, `Rs ${current.advance || 0}`],
+            [`Balance`, `Rs ${balance}`],
             [`Remarks`, current.remarks || "-"],
         ];
         lines.forEach(([label, value]) => {
@@ -56,16 +59,18 @@ export function downloadClientReport(client, history) {
     autoTable(doc, {
         startY: y,
         margin: { left: marginX, right: marginX },
-        head: [["S.No", "Date", "Description", "Cost", "Remarks", "Status"]],
+        head: [["S.No", "Date", "Description", "Cost", "Advance", "Balance", "Remarks", "Status"]],
         body: history.map((r, i) => [
             i + 1,
             r.date || "-",
             r.defect || "-",
             `Rs ${r.cost || "-"}`,
+            `Rs ${r.advance || 0}`,
+            `Rs ${(Number(r.cost) || 0) - (Number(r.advance) || 0)}`,
             r.remarks || "-",
             r.status || "-",
         ]),
-        styles: { fontSize: 9, cellPadding: 5 },
+        styles: { fontSize: 8, cellPadding: 4 },
         headStyles: { fillColor: [22, 32, 42] },
     });
 

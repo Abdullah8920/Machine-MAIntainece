@@ -118,26 +118,47 @@ export default function ClientDetail() {
               >
                 Current Status
               </span>
-              <select
-                value={current.status}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                disabled={updating}
-                style={{
-                  background: "var(--ink-3)",
-                  color: "var(--paper)",
-                  border: "1px solid var(--steel)",
-                  borderRadius: "20px",
-                  padding: "3px 10px",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "11px",
-                  textTransform: "uppercase",
-                  cursor: updating ? "not-allowed" : "pointer",
-                }}
-              >
-                <option value="Pending">Pending</option>
-                <option value="Active">Active</option>
-                <option value="Completed">Completed</option>
-              </select>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <button
+                  onClick={() => router.push(`/client/${id}/edit`)}
+                  aria-label="Edit entry"
+                  style={{
+                    background: "var(--ink-3)",
+                    border: "1px solid var(--steel)",
+                    borderRadius: "6px",
+                    width: "28px",
+                    height: "28px",
+                    color: "var(--paper)",
+                    fontSize: "13px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✎
+                </button>
+                <select
+                  value={current.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  disabled={updating}
+                  style={{
+                    background: "var(--ink-3)",
+                    color: "var(--paper)",
+                    border: "1px solid var(--steel)",
+                    borderRadius: "20px",
+                    padding: "3px 10px",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    textTransform: "uppercase",
+                    cursor: updating ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Active">Active</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
             </div>
 
             {current.image && (
@@ -156,7 +177,13 @@ export default function ClientDetail() {
 
             <DetailRow label="Date" value={current.date} />
             <DetailRow label="Defect" value={current.defect} />
-            <DetailRow label="Cost" value={`Rs ${current.cost}`} />
+            <DetailRow label="Total Cost" value={`Rs ${current.cost}`} />
+            <DetailRow label="Advance Received" value={`Rs ${current.advance || 0}`} />
+            <DetailRow
+              label="Balance"
+              value={`Rs ${(Number(current.cost) || 0) - (Number(current.advance) || 0)}`}
+              highlight
+            />
             {current.remarks && <DetailRow label="Remarks" value={current.remarks} last />}
           </Card>
         )}
@@ -185,7 +212,7 @@ export default function ClientDetail() {
   );
 }
 
-function DetailRow({ label, value, last = false }) {
+function DetailRow({ label, value, last = false, highlight = false }) {
   return (
     <div
       style={{
@@ -197,7 +224,17 @@ function DetailRow({ label, value, last = false }) {
       }}
     >
       <span style={{ color: "var(--paper-dim)" }}>{label}</span>
-      <span style={{ color: "var(--paper)", textAlign: "right", maxWidth: "65%" }}>{value}</span>
+      <span
+        style={{
+          color: highlight ? "var(--amber)" : "var(--paper)",
+          fontFamily: highlight ? "var(--font-mono)" : undefined,
+          fontWeight: highlight ? 600 : 400,
+          textAlign: "right",
+          maxWidth: "65%",
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }

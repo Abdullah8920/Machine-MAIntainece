@@ -14,6 +14,7 @@ const initialForm = {
   date: "",
   defect: "",
   cost: "",
+  advance: "",
   remarks: "",
 };
 
@@ -67,7 +68,18 @@ export default function AddMachine() {
         <Input label="Machine Name" name="machineName" value={form.machineName} onChange={handleChange} required />
         <Input label="Date" name="date" type="date" value={form.date} onChange={handleChange} required />
         <Input label="Defect" name="defect" as="textarea" value={form.defect} onChange={handleChange} required />
-        <Input label="Cost" name="cost" type="number" value={form.cost} onChange={handleChange} required />
+        <Input label="Total Cost" name="cost" type="number" value={form.cost} onChange={handleChange} required />
+        <Input label="Advance Received" name="advance" type="number" value={form.advance} onChange={handleChange} />
+
+        {form.cost && (
+          <p style={{ fontSize: "13px", color: "var(--paper-dim)", marginTop: "-10px", marginBottom: "16px" }}>
+            Balance:{" "}
+            <span style={{ color: "var(--amber)", fontFamily: "var(--font-mono)" }}>
+              Rs {(Number(form.cost) || 0) - (Number(form.advance) || 0)}
+            </span>
+          </p>
+        )}
+
         <Input label="Remarks" name="remarks" as="textarea" value={form.remarks} onChange={handleChange} />
 
         <div style={{ marginBottom: "20px" }}>

@@ -61,6 +61,7 @@ export async function addMachineEntry({
   date,
   defect,
   cost,
+  advance = 0,
   remarks,
   image = null,
   status = "Pending",
@@ -85,6 +86,7 @@ export async function addMachineEntry({
     date,
     defect,
     cost,
+    advance,
     remarks,
     image,
     status,
@@ -148,6 +150,24 @@ export async function updateMachineStatus(clientId, machineId, status) {
   await updateDoc(ref, { [`machines.${machineId}.status`]: status });
 }
 
+/**
+ * Updates any combination of fields (machineName, date, defect, cost,
+ * remarks, image, status) on an existing machine entry.
+ */
+export async function updateMachineEntry(clientId, machineId, updates) {
+  const ref = doc(db, CLIENTS_COLLECTION, clientId);
+  const fieldUpdates = {};
+  Object.keys(updates).forEach((key) => {
+    fieldUpdates[`machines.${machineId}.${key}`] = updates[key];
+  });
+  await updateDoc(ref, fieldUpdates);
+}
+
+/**
+ * Finds every machine entry (across all clients) whose date matches
+ * the given date (format: YYYY-MM-DD, same as an <input type="date">).
+ * Returns flat records with client info attached, newest first.
+ */
 export async function searchByDate(date) {
   if (!date) return [];
   const clients = await getAllClients();
@@ -165,5 +185,6 @@ export async function searchByDate(date) {
       }
     });
   });
+
   return matches;
 }

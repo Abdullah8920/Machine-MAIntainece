@@ -46,6 +46,23 @@ export default function HistoryTable({ records }) {
               Rs {r.cost}
             </span>
           </div>
+
+          {Number(r.advance) > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "12px",
+                marginTop: "4px",
+                paddingTop: "4px",
+                borderTop: "1px dashed var(--ink-3)",
+                color: "var(--paper-dim)",
+              }}
+            >
+              <span>Advance: Rs {r.advance}</span>
+              <span>Balance: Rs {(Number(r.cost) || 0) - (Number(r.advance) || 0)}</span>
+            </div>
+          )}
         </div>
       ))}
     </div>
