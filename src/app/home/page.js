@@ -4,20 +4,6 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Card from "@/components/Card";
 
-
-const FLOATING_TOOLS = [
-  { icon: "🔧", top: "8%", left: "14%", delay: "0s", size: "20px" },
-  { icon: "⚙️", top: "12%", left: "78%", delay: "0.6s", size: "18px" },
-  { icon: "🛠️", top: "28%", left: "22%", delay: "1.1s", size: "16px" },
-  { icon: "🔩", top: "34%", left: "84%", delay: "0.3s", size: "18px" },
-  { icon: "🪛", top: "48%", left: "10%", delay: "1.4s", size: "18px" },
-  { icon: "🔧", top: "58%", left: "88%", delay: "0.8s", size: "16px" },
-  { icon: "⚙️", top: "68%", left: "18%", delay: "0.2s", size: "20px" },
-  { icon: "🛠️", top: "78%", left: "80%", delay: "1.2s", size: "16px" },
-  { icon: "🔩", top: "90%", left: "30%", delay: "0.5s", size: "18px" },
-];
-
-
 const OPTIONS = [
   {
     to: "/add-machine",
@@ -31,22 +17,54 @@ const OPTIONS = [
     title: "Search Client / Project",
     subtitle: "Look up service history",
   },
-  // {
-  //   to: "/history",
-  //   icon: "📋",
-  //   title: "All History",
-  //   subtitle: "Browse every client on record",
-  // },
+  {
+    to: "/history",
+    icon: "📋",
+    title: "All History",
+    subtitle: "Browse every client on record",
+  },
+];
+
+const FLOATING_TOOLS = [
+  { icon: "🔧", top: "6%", left: "82%", delay: "0s", size: "18px" },
+  { icon: "⚙️", top: "18%", left: "10%", delay: "0.5s", size: "16px" },
+  { icon: "🛠️", top: "34%", left: "88%", delay: "1s", size: "18px" },
+  { icon: "🔩", top: "46%", left: "6%", delay: "0.3s", size: "16px" },
+  { icon: "🪛", top: "58%", left: "80%", delay: "1.3s", size: "18px" },
+  { icon: "🔧", top: "70%", left: "14%", delay: "0.8s", size: "16px" },
+  { icon: "⚙️", top: "82%", left: "86%", delay: "0.2s", size: "18px" },
+  { icon: "🛠️", top: "92%", left: "20%", delay: "1.1s", size: "16px" },
 ];
 
 export default function Home() {
   const router = useRouter();
 
   return (
+    <div className="page" style={{ position: "relative", overflow: "hidden" }}>
+      {/* Scattered floating tool icons (decorative background) */}
+      {FLOATING_TOOLS.map((tool, i) => (
+        <span
+          key={i}
+          className="floating"
+          style={{
+            position: "absolute",
+            top: tool.top,
+            left: tool.left,
+            fontSize: tool.size,
+            opacity: 0.3,
+            animationDelay: tool.delay,
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        >
+          {tool.icon}
+        </span>
+      ))}
 
-    <div className="page">
-      <Header title="Home" />
-      <div className="page-content">
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <Header title="Home" />
+      </div>
+      <div className="page-content" style={{ position: "relative", zIndex: 1 }}>
         <p
           style={{
             fontSize: "12px",
@@ -58,7 +76,6 @@ export default function Home() {
         >
           Choose an option
         </p>
-
 
         {OPTIONS.map((opt) => (
           <Card

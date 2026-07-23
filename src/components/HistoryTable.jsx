@@ -1,7 +1,7 @@
 import StatusBadge from "./StatusBadge";
 import EmptyState from "./EmptyState";
 
-export default function HistoryTable({ records }) {
+export default function HistoryTable({ records, onRecordClick }) {
   if (!records || records.length === 0) {
     return (
       <EmptyState
@@ -16,11 +16,13 @@ export default function HistoryTable({ records }) {
       {records.map((r, i) => (
         <div
           key={r.id || i}
+          onClick={() => onRecordClick && onRecordClick(r.id)}
           style={{
             background: "var(--ink-2)",
             border: "1px solid var(--ink-3)",
             borderRadius: "10px",
             padding: "12px 14px",
+            cursor: onRecordClick ? "pointer" : "default",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -62,6 +64,12 @@ export default function HistoryTable({ records }) {
               <span>Advance: Rs {r.advance}</span>
               <span>Balance: Rs {(Number(r.cost) || 0) - (Number(r.advance) || 0)}</span>
             </div>
+          )}
+
+          {onRecordClick && (
+            <p style={{ margin: "8px 0 0", fontSize: "11px", color: "var(--steel)", textAlign: "right" }}>
+              View full details →
+            </p>
           )}
         </div>
       ))}

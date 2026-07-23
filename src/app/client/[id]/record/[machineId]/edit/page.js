@@ -13,14 +13,14 @@ import {
   updateClientInfo,
 } from "@/services/machineService";
 
-export default function EditMachine() {
-  const { id } = useParams();
+export default function EditRecord() {
+  const { id, machineId } = useParams();
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [machineId, setMachineId] = useState(null);
+  const [found, setFound] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [form, setForm] = useState({
     clientName: "",
@@ -44,22 +44,22 @@ export default function EditMachine() {
         getClientById(id),
         getClientHistory(id),
       ]);
-      const current = history[0];
+      const record = history.find((r) => r.id === machineId);
 
-      if (!cancelled && client && current) {
-        setMachineId(current.id);
-        setImagePreview(current.image || null);
+      if (!cancelled && client && record) {
+        setFound(true);
+        setImagePreview(record.image || null);
         setForm({
           clientName: client.clientName || "",
           companyName: client.companyName || "",
-          machineName: current.machineName || "",
-          machineType: current.machineType || "New",
-          date: current.date || "",
-          deliveryDate: current.deliveryDate || "",
-          defect: current.defect || "",
-          cost: current.cost || "",
-          advance: current.advance || "",
-          remarks: current.remarks || "",
+          machineName: record.machineName || "",
+          machineType: record.machineType || "New",
+          date: record.date || "",
+          deliveryDate: record.deliveryDate || "",
+          defect: record.defect || "",
+          cost: record.cost || "",
+          advance: record.advance || "",
+          remarks: record.remarks || "",
         });
       }
       if (!cancelled) setLoading(false);
@@ -69,7 +69,7 @@ export default function EditMachine() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, machineId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -102,7 +102,7 @@ export default function EditMachine() {
         updateClientInfo(id, { clientName, companyName }),
         updateMachineEntry(id, machineId, machineFields),
       ]);
-      router.push(`/client/${id}`);
+      router.push(`/client/${id}/record/${machineId}`);
     } catch (err) {
       console.error(err);
       setError("Could not save. Check your Firebase config and internet connection.");
@@ -113,20 +113,20 @@ export default function EditMachine() {
   if (loading) {
     return (
       <div className="page">
-        <Header title="Edit Entry" back />
+        <Header title="Edit Record" back />
         <div className="page-content">
-          <EmptyState icon="⋯" title="Loading" message="Fetching the current record." />
+          <EmptyState icon="⋯" title="Loading" message="Fetching this record." />
         </div>
       </div>
     );
   }
 
-  if (!machineId) {
+  if (!found) {
     return (
       <div className="page">
-        <Header title="Edit Entry" back />
+        <Header title="Edit Record" back />
         <div className="page-content">
-          <EmptyState title="Nothing to edit" message="This client has no entries yet." />
+          <EmptyState title="Record not found" message="This entry may have been removed." />
         </div>
       </div>
     );
@@ -134,7 +134,7 @@ export default function EditMachine() {
 
   return (
     <div className="page">
-      <Header title="Edit Entry" back />
+      <Header title="Edit Record" back />
       <div className="page-content">
         <Input label="Client Name" name="clientName" value={form.clientName} onChange={handleChange} required />
         <Input label="Company Name" name="companyName" value={form.companyName} onChange={handleChange} required />
@@ -178,7 +178,7 @@ export default function EditMachine() {
           </label>
 
           <label
-            htmlFor="machine-image-edit"
+            htmlFor="record-image-edit"
             style={{
               marginTop: "6px",
               display: "flex",
@@ -205,7 +205,7 @@ export default function EditMachine() {
             )}
           </label>
           <input
-            id="machine-image-edit"
+            id="record-image-edit"
             type="file"
             accept="image/*"
             onChange={handleImage}

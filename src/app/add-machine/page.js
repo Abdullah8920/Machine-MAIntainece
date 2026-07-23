@@ -1,75 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import EmptyState from "@/components/EmptyState";
-import {
-  getClientById,
-  getClientHistory,
-  updateMachineEntry,
-  updateClientInfo,
-} from "@/services/machineService";
+import { addMachineEntry, addMachineToClient, getClientById } from "@/services/machineService";
 
-export default function EditMachine() {
-  const { id } = useParams();
+const initialForm = {
+  clientName: "",
+  companyName: "",
+  machineName: "",
+  machineType: "New",
+  date: "",
+  deliveryDate: "",
+  defect: "",
+  cost: "",
+  advance: "",
+  remarks: "",
+};
+
+export default function AddMachinePage() {
+  return (
+    <Suspense fallback={null}>
+      <AddMachine />
+    </Suspense>
+  );
+}
+
+function AddMachine() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get("clientId");
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [machineId, setMachineId] = useState(null);
+  const [form, setForm] = useState(initialForm);
   const [imagePreview, setImagePreview] = useState(null);
-  const [form, setForm] = useState({
-    clientName: "",
-    companyName: "",
-    machineName: "",
-    machineType: "New",
-    date: "",
-    deliveryDate: "",
-    defect: "",
-    cost: "",
-    advance: "",
-    remarks: "",
-  });
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
+  // If we arrived via "+ Add Another Visit", lock the client/company
+  // fields to the existing client so a typo can never create a
+  // duplicate client record.
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      const [client, history] = await Promise.all([
-        getClientById(id),
-        getClientHistory(id),
-      ]);
-      const current = history[0];
-
-      if (!cancelled && client && current) {
-        setMachineId(current.id);
-        setImagePreview(current.image || null);
-        setForm({
-          clientName: client.clientName || "",
-          companyName: client.companyName || "",
-          machineName: current.machineName || "",
-          machineType: current.machineType || "New",
-          date: current.date || "",
-          deliveryDate: current.deliveryDate || "",
-          defect: current.defect || "",
-          cost: current.cost || "",
-          advance: current.advance || "",
-          remarks: current.remarks || "",
-        });
+    if (!clientId) return;
+    getClientById(clientId).then((client) => {
+      if (client) {
+        setForm((prev) => ({
+          ...prev,
+          clientName: client.clientName,
+          companyName: client.companyName,
+        }));
       }
-      if (!cancelled) setLoading(false);
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+    });
+  }, [clientId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,15 +77,21 @@ export default function EditMachine() {
     setError("");
     setSaving(true);
 
-    const { clientName, companyName, ...machineFields } = form;
-    machineFields.image = imagePreview;
-
     try {
-      await Promise.all([
-        updateClientInfo(id, { clientName, companyName }),
-        updateMachineEntry(id, machineId, machineFields),
-      ]);
-      router.push(`/client/${id}`);
+      let targetClientId;
+      if (clientId) {
+        const { clientName, companyName, ...machineFields } = form;
+        const result = await addMachineToClient(clientId, {
+          ...machineFields,
+          image: imagePreview,
+          status: "Pending",
+        });
+        targetClientId = result.clientId;
+      } else {
+        const result = await addMachineEntry({ ...form, image: imagePreview });
+        targetClientId = result.clientId;
+      }
+      router.push(`/client/${targetClientId}`);
     } catch (err) {
       console.error(err);
       setError("Could not save. Check your Firebase config and internet connection.");
@@ -110,34 +99,12 @@ export default function EditMachine() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="page">
-        <Header title="Edit Entry" back />
-        <div className="page-content">
-          <EmptyState icon="⋯" title="Loading" message="Fetching the current record." />
-        </div>
-      </div>
-    );
-  }
-
-  if (!machineId) {
-    return (
-      <div className="page">
-        <Header title="Edit Entry" back />
-        <div className="page-content">
-          <EmptyState title="Nothing to edit" message="This client has no entries yet." />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="page">
-      <Header title="Edit Entry" back />
+      <Header title="Add Machine Detail" back />
       <div className="page-content">
-        <Input label="Client Name" name="clientName" value={form.clientName} onChange={handleChange} required />
-        <Input label="Company Name" name="companyName" value={form.companyName} onChange={handleChange} required />
+        <Input label="Client Name" name="clientName" value={form.clientName} onChange={handleChange} disabled={!!clientId} required />
+        <Input label="Company Name" name="companyName" value={form.companyName} onChange={handleChange} disabled={!!clientId} required />
         <Input label="Machine Name" name="machineName" value={form.machineName} onChange={handleChange} required />
         <Input
           label="Machine Type"
@@ -174,11 +141,11 @@ export default function EditMachine() {
               fontWeight: 600,
             }}
           >
-            Machine Image
+            Upload Image
           </label>
 
           <label
-            htmlFor="machine-image-edit"
+            htmlFor="machine-image"
             style={{
               marginTop: "6px",
               display: "flex",
@@ -205,29 +172,12 @@ export default function EditMachine() {
             )}
           </label>
           <input
-            id="machine-image-edit"
+            id="machine-image"
             type="file"
             accept="image/*"
             onChange={handleImage}
             style={{ display: "none" }}
           />
-          {imagePreview && (
-            <button
-              onClick={() => setImagePreview(null)}
-              style={{
-                marginTop: "8px",
-                background: "none",
-                border: "none",
-                color: "var(--danger)",
-                fontSize: "12px",
-                textDecoration: "underline",
-                cursor: "pointer",
-                padding: 0,
-              }}
-            >
-              Remove photo
-            </button>
-          )}
         </div>
 
         {error && (
@@ -235,7 +185,7 @@ export default function EditMachine() {
         )}
 
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? "Saving..." : "Save Changes"}
+          {saving ? "Saving..." : "Save"}
         </Button>
       </div>
     </div>

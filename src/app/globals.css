@@ -2,25 +2,16 @@
 
 :root {
   /* Color tokens — industrial workshop palette */
-  --ink: #16202A;
-  /* graphite background */
-  --ink-2: #1F2C38;
-  /* panel surface */
-  --ink-3: #2B3A47;
-  /* raised surface / borders */
-  --steel: #6E8AA6;
-  /* muted steel blue */
-  --amber: #F2A93B;
-  /* safety amber accent */
+  --ink: #16202A;         /* graphite background */
+  --ink-2: #1F2C38;       /* panel surface */
+  --ink-3: #2B3A47;       /* raised surface / borders */
+  --steel: #6E8AA6;       /* muted steel blue */
+  --amber: #F2A93B;       /* safety amber accent */
   --amber-dim: #C98A2C;
-  --green: #4FA97A;
-  /* completed */
-  --blue: #4E8FD6;
-  /* active */
-  --paper: #EDEFF2;
-  /* light text on dark */
-  --paper-dim: #9AA7B2;
-  /* secondary text */
+  --green: #4FA97A;       /* completed */
+  --blue: #4E8FD6;        /* active */
+  --paper: #EDEFF2;       /* light text on dark */
+  --paper-dim: #9AA7B2;   /* secondary text */
   --danger: #D9604F;
 
   --font-display: 'Barlow Condensed', sans-serif;
@@ -35,8 +26,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   background: var(--ink);
@@ -53,26 +43,17 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--ink);
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
 }
 
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0.01em;
   margin: 0;
 }
 
-p,
-label,
-span,
-input,
-select,
-textarea,
-button {
+p, label, span, input, select, textarea, button {
   font-family: var(--font-body);
 }
 
@@ -86,16 +67,11 @@ button {
   cursor: pointer;
 }
 
-input,
-select,
-textarea {
+input, select, textarea {
   outline: none;
 }
 
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-button:focus-visible {
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
@@ -107,8 +83,8 @@ button:focus-visible {
 /* Blueprint grid texture — signature background motif */
 .blueprint-bg {
   background-image:
-    linear-gradient(rgba(110, 138, 166, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(110, 138, 166, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(110,138,166,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110,138,166,0.08) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -127,15 +103,8 @@ button:focus-visible {
 /* ---------- Animations ---------- */
 
 @keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-12px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }
 
 .floating {
@@ -143,13 +112,8 @@ button:focus-visible {
 }
 
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .spin-slow {
@@ -157,25 +121,14 @@ button:focus-visible {
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in-up {
   animation: fadeInUp 0.6s ease-out both;
 }
 
-
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
-  }
+  * { animation: none !important; transition: none !important; }
 }

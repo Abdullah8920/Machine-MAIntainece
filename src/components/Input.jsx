@@ -8,6 +8,7 @@ export default function Input({
   as = "input",
   options = [],
   required = false,
+  disabled = false,
 }) {
   const fieldStyle = {
     width: "100%",
@@ -15,9 +16,10 @@ export default function Input({
     marginTop: "6px",
     borderRadius: "8px",
     border: "1px solid var(--ink-3)",
-    background: "var(--ink-2)",
-    color: "var(--paper)",
+    background: disabled ? "var(--ink-3)" : "var(--ink-2)",
+    color: disabled ? "var(--paper-dim)" : "var(--paper)",
     fontSize: "15px",
+    cursor: disabled ? "not-allowed" : "text",
   };
 
   return (
@@ -36,7 +38,7 @@ export default function Input({
       </label>
 
       {as === "select" ? (
-        <select name={name} value={value} onChange={onChange} style={fieldStyle}>
+        <select name={name} value={value} onChange={onChange} disabled={disabled} style={fieldStyle}>
           {options.map((opt) => (
             <option key={opt} value={opt}>
               {opt}
@@ -49,6 +51,7 @@ export default function Input({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          disabled={disabled}
           rows={3}
           style={{ ...fieldStyle, resize: "vertical" }}
         />
@@ -59,6 +62,7 @@ export default function Input({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          disabled={disabled}
           style={fieldStyle}
         />
       )}

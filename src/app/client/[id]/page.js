@@ -8,7 +8,7 @@ import HistoryTable from "@/components/HistoryTable";
 import Button from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
 import { getClientById, getClientHistory, updateMachineStatus } from "@/services/machineService";
-import { downloadClientReport } from "@/utils/pdfreport";
+import { downloadClientReport } from "@/utils/pdfReport";
 
 export default function ClientDetail() {
   const { id } = useParams();
@@ -155,7 +155,7 @@ export default function ClientDetail() {
                   }}
                 >
                   <option value="Pending">Pending</option>
-                  <option value="Active">Under-Process</option>
+                  <option value="Active">Under Process</option>
                   <option value="Completed">Completed</option>
                 </select>
               </div>

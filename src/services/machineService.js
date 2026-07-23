@@ -68,12 +68,15 @@ export async function addMachineEntry({
   image = null,
   status = "Pending",
 }) {
+  clientName = (clientName || "").trim();
+  companyName = (companyName || "").trim();
+
   const clients = await getAllClients();
 
   const existing = clients.find(
     (c) =>
-      c.clientName.toLowerCase() === clientName.toLowerCase() &&
-      c.companyName.toLowerCase() === companyName.toLowerCase()
+      c.clientName.trim().toLowerCase() === clientName.toLowerCase() &&
+      c.companyName.trim().toLowerCase() === companyName.toLowerCase()
   );
 
   const clientId = existing
@@ -96,17 +99,18 @@ export async function addMachineEntry({
     status,
   };
 
-  if (!existing) {
-    await setDoc(ref, {
+  // merge: true is a safety net — even if `existing` matching missed a
+  // near-duplicate name and this clientId happens to already exist,
+  // this will merge into the doc instead of wiping its other machines.
+  await setDoc(
+    ref,
+    {
       clientName,
       companyName,
       machines: { [machineId]: machineEntry },
-    });
-  } else {
-    await updateDoc(ref, {
-      [`machines.${machineId}`]: machineEntry,
-    });
-  }
+    },
+    { merge: true }
+  );
 
   return { clientId, machineId };
 }
@@ -147,6 +151,23 @@ export async function getClientHistory(clientId) {
   return Object.values(client.machines || {}).sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
+}
+
+/**
+ * Adds a machine entry directly to a known client (by ID) — used by
+ * "Add Another Visit" so a typo/case mismatch in the name fields
+ * can never accidentally create a duplicate client.
+ */
+export async function addMachineToClient(clientId, machineData) {
+  const client = await getClientById(clientId);
+  if (!client) throw new Error("Client not found");
+
+  const machineId = makeId("machine");
+  const ref = doc(db, CLIENTS_COLLECTION, clientId);
+  const machineEntry = { id: machineId, ...machineData };
+
+  await updateDoc(ref, { [`machines.${machineId}`]: machineEntry });
+  return { clientId, machineId };
 }
 
 export async function updateMachineStatus(clientId, machineId, status) {

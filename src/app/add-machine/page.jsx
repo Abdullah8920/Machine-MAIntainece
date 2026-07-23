@@ -1,28 +1,58 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { addMachineEntry } from "@/services/machineService";
+import { addMachineEntry, addMachineToClient, getClientById } from "@/services/machineService";
 
 const initialForm = {
   clientName: "",
   companyName: "",
   machineName: "",
+  machineType: "New",
   date: "",
+  deliveryDate: "",
   defect: "",
   cost: "",
   advance: "",
   remarks: "",
 };
 
-export default function AddMachine() {
+export default function AddMachinePage() {
+  return (
+    <Suspense fallback={null}>
+      <AddMachine />
+    </Suspense>
+  );
+}
+
+function AddMachine() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get("clientId");
+
   const [form, setForm] = useState(initialForm);
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  // If we arrived via "+ Add Another Visit", lock the client/company
+  // fields to the existing client so a typo can never create a
+  // duplicate client record.
+  useEffect(() => {
+    if (!clientId) return;
+    getClientById(clientId).then((client) => {
+      if (client) {
+        setForm((prev) => ({
+          ...prev,
+          clientName: client.clientName,
+          companyName: client.companyName,
+        }));
+      }
+    });
+  }, [clientId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,8 +67,6 @@ export default function AddMachine() {
     reader.readAsDataURL(file);
   };
 
-  const [saving, setSaving] = useState(false);
-
   const handleSave = async () => {
     const required = ["clientName", "companyName", "machineName", "date", "defect", "cost"];
     const missing = required.some((key) => !form[key]);
@@ -50,8 +78,20 @@ export default function AddMachine() {
     setSaving(true);
 
     try {
-      const { clientId } = await addMachineEntry({ ...form, image: imagePreview });
-      router.push(`/client/${clientId}`);
+      let targetClientId;
+      if (clientId) {
+        const { clientName, companyName, ...machineFields } = form;
+        const result = await addMachineToClient(clientId, {
+          ...machineFields,
+          image: imagePreview,
+          status: "Pending",
+        });
+        targetClientId = result.clientId;
+      } else {
+        const result = await addMachineEntry({ ...form, image: imagePreview });
+        targetClientId = result.clientId;
+      }
+      router.push(`/client/${targetClientId}`);
     } catch (err) {
       console.error(err);
       setError("Could not save. Check your Firebase config and internet connection.");
@@ -63,10 +103,19 @@ export default function AddMachine() {
     <div className="page">
       <Header title="Add Machine Detail" back />
       <div className="page-content">
-        <Input label="Client Name" name="clientName" value={form.clientName} onChange={handleChange} required />
-        <Input label="Company Name" name="companyName" value={form.companyName} onChange={handleChange} required />
+        <Input label="Client Name" name="clientName" value={form.clientName} onChange={handleChange} disabled={!!clientId} required />
+        <Input label="Company Name" name="companyName" value={form.companyName} onChange={handleChange} disabled={!!clientId} required />
         <Input label="Machine Name" name="machineName" value={form.machineName} onChange={handleChange} required />
+        <Input
+          label="Machine Type"
+          name="machineType"
+          as="select"
+          options={["New", "Old"]}
+          value={form.machineType}
+          onChange={handleChange}
+        />
         <Input label="Date" name="date" type="date" value={form.date} onChange={handleChange} required />
+        <Input label="Delivery Date" name="deliveryDate" type="date" value={form.deliveryDate} onChange={handleChange} />
         <Input label="Defect" name="defect" as="textarea" value={form.defect} onChange={handleChange} required />
         <Input label="Total Cost" name="cost" type="number" value={form.cost} onChange={handleChange} required />
         <Input label="Advance Received" name="advance" type="number" value={form.advance} onChange={handleChange} />
