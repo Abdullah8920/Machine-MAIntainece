@@ -49,3 +49,6 @@ src/
 ├── firebase/       firebase.js (config placeholder)
 └── services/       machineService.js (data layer)
 ```
+## LIVE LINK
+...
+https://machine-ma-intainece.vercel.app/
