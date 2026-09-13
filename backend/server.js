@@ -8,9 +8,21 @@ import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = process.env.CLIENT_ORIGIN
+  ? process.env.CLIENT_ORIGIN.split(",").map((o) => o.trim().replace(/\/$/, ""))
+  : ["http://localhost:3000", "http://localhost:3001"];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, "");
+      if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes("*")) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS policy violation for origin: ${origin}`), false);
+    },
+    credentials: true,
   })
 );
 app.use(express.json({ limit: "10mb" }));
