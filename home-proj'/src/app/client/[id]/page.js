@@ -8,7 +8,7 @@ import HistoryTable from "@/components/HistoryTable";
 import Button from "@/components/Button";
 import EmptyState from "@/components/EmptyState";
 import { getClientById, getClientHistory, updateMachineStatus } from "@/services/machineService";
-import { downloadClientReport } from "@/utils/pdfReport";
+import { downloadClientReport } from "@/utils/pdfreport";
 
 export default function ClientDetail() {
   const { id } = useParams();
